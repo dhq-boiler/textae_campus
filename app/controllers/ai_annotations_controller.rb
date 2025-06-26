@@ -26,7 +26,7 @@ class AiAnnotationsController < ApplicationController
 
   def update
     @ai_annotation = AiAnnotation.find_by(uuid: params[:id])
-    @ai_annotation.text_json = JSON.parse(ai_annotation_params[:content])
+    @ai_annotation.text = ai_annotation_params[:content]
     @ai_annotation.prompt = ai_annotation_params[:prompt]
 
     ai_annotation = @ai_annotation.annotate!

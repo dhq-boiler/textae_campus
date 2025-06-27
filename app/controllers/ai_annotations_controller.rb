@@ -50,17 +50,4 @@ class AiAnnotationsController < ApplicationController
   def ai_annotation_params
     params.require(:ai_annotation).permit(:text, :prompt, :content)
   end
-
-  # Convert symbol keys to string keys in arrays so they can be accessed with array["key"] syntax
-  # This conversion is applied recursively to nested elements
-  def convert_to_indifferent_access(obj)
-    case obj
-    when Hash
-      obj.with_indifferent_access.transform_values { |v| convert_to_indifferent_access(v) }
-    when Array
-      obj.map { |item| convert_to_indifferent_access(item) }
-    else
-      obj
-    end
-  end
 end

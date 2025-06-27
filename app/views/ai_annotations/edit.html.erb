@@ -9,7 +9,7 @@
     <%= f.textarea :prompt, required: true, rows: 3, placeholder: "Order how to annotate the text" %>
   </div>
 
-  <%= f.hidden_field :content, id: 'textae-annotation' %>
+  <%= f.hidden_field :content, id: 'textae-annotation', value: @content_json %>
 
   <div class="submit-field">
     <%= f.submit "Annotate", disabled: true, class: "button" %>

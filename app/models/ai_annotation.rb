@@ -54,6 +54,28 @@ class AiAnnotation < ApplicationRecord
     AiAnnotation.create!(content: result)
   end
 
+  # contentをJSON形式で取得する
+  def content_as_json
+    # contentがJSON文字列かどうかをチェック
+    begin
+      parsed = JSON.parse(content)
+      # textキーとdenotationsキーを持つハッシュの場合、既にJSON構造と判断
+      if parsed.is_a?(Hash) && parsed.key?('text') && parsed.key?('denotations')
+        return parsed
+      end
+    rescue JSON::ParserError
+      # JSONとして解析できない場合は通常のパース処理を続行
+    end
+
+    # 通常のパース処理
+    SimpleInlineTextAnnotation.parse(content)
+  end
+
+  # JSON形式の内容からcontent属性にシンプルインラインテキストフォーマットを設定
+  def content_in_json=(annotation_json)
+    annotation_json = convert_to_indifferent_access(annotation_json)
+    self.content = SimpleInlineTextAnnotation.generate(annotation_json)
+  end
 
   private
 
@@ -63,5 +85,18 @@ class AiAnnotation < ApplicationRecord
 
   def set_uuid
     self.uuid = SecureRandom.uuid
+  end
+
+  # Convert symbol keys to string keys in arrays so they can be accessed with array["key"] syntax
+  # This conversion is applied recursively to nested elements
+  def convert_to_indifferent_access(obj)
+    case obj
+    when Hash
+      obj.with_indifferent_access.transform_values { |v| convert_to_indifferent_access(v) }
+    when Array
+      obj.map { |item| convert_to_indifferent_access(item) }
+    else
+      obj
+    end
   end
 end

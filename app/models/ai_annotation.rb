@@ -71,7 +71,7 @@ class AiAnnotation < ApplicationRecord
       # JSONとして解析できない場合は通常のパース処理を続行
     end
 
-    # 通常のパース処理
+    # 通常のパース処理（シンプルインラインテキストフォーマット→JSON）
     SimpleInlineTextAnnotation.parse(content)
   end
 

@@ -58,24 +58,24 @@ class AiAnnotation < ApplicationRecord
     self.text = convert_to_indifferent_access(annotation_json)
   end
 
-  # contentをJSON形式で取得する
+  # Get content as JSON format
   def content_as_json
-    # contentがJSON文字列かどうかをチェック
+    # Check if content is a JSON string
     begin
       parsed = JSON.parse(content)
-      # textキーとdenotationsキーを持つハッシュの場合、既にJSON構造と判断
+      # If it's a hash with 'text' and 'denotations' keys, considered as JSON structure already
       if parsed.is_a?(Hash) && parsed.key?('text') && parsed.key?('denotations')
         return parsed
       end
     rescue JSON::ParserError
-      # JSONとして解析できない場合は通常のパース処理を続行
+      # Continue with normal parsing process if JSON parsing fails
     end
 
-    # 通常のパース処理（シンプルインラインテキストフォーマット→JSON）
+    # Normal parsing process (Simple inline text format -> JSON)
     SimpleInlineTextAnnotation.parse(content)
   end
 
-  # JSON形式の内容からcontent属性にシンプルインラインテキストフォーマットを設定
+  # Set simple inline text format to content attribute from JSON format
   def content_in_json=(annotation_json)
     annotation_json = SimpleInlineTextAnnotation.parse(convert_to_indifferent_access(annotation_json))
     annotation_json = convert_to_indifferent_access(annotation_json)

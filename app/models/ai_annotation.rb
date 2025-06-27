@@ -64,7 +64,7 @@ class AiAnnotation < ApplicationRecord
     begin
       parsed = JSON.parse(content)
       # If it's a hash with 'text' and 'denotations' keys, considered as JSON structure already
-      if parsed.is_a?(Hash) && parsed.key?('text') && parsed.key?('denotations')
+      if parsed.is_a?(Hash) && parsed.key?("text") && parsed.key?("denotations")
         return parsed
       end
     rescue JSON::ParserError

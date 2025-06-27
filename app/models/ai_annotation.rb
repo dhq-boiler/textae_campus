@@ -54,6 +54,10 @@ class AiAnnotation < ApplicationRecord
     AiAnnotation.create!(content: result)
   end
 
+  def text_in_json=(annotation_json)
+    self.text = convert_to_indifferent_access(annotation_json)
+  end
+
   # contentをJSON形式で取得する
   def content_as_json
     # contentがJSON文字列かどうかをチェック
@@ -73,6 +77,7 @@ class AiAnnotation < ApplicationRecord
 
   # JSON形式の内容からcontent属性にシンプルインラインテキストフォーマットを設定
   def content_in_json=(annotation_json)
+    annotation_json = SimpleInlineTextAnnotation.parse(convert_to_indifferent_access(annotation_json))
     annotation_json = convert_to_indifferent_access(annotation_json)
     self.content = SimpleInlineTextAnnotation.generate(annotation_json)
   end

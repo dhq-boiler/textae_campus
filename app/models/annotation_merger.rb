@@ -66,12 +66,13 @@ class AnnotationMerger
     @id_mappings ||= @annotations.each_with_object([]) do |annotation, id_mappings|
       denotations = annotation["denotations"]
 
-      chunk_mapping = denotations.each_with_object({}) do |denotation, mapping|
+      chunk_mapping = {}
+      denotations.each do |denotation|
         new_id = "T#{id_seq}"
-        mapping[denotation["id"]] = new_id
+        chunk_mapping[new_id] = new_id
+        denotation["id"] = new_id
         id_seq += 1
       end
-
       id_mappings << chunk_mapping
     end
   end

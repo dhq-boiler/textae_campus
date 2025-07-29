@@ -16,7 +16,7 @@ class AiAnnotation < ApplicationRecord
   def annotate!
     openai_annotator = OpenAiAnnotator.new
 
-    # SimpleInlineTextAnnotationはキーをシンボルで返します
+    # SimpleInlineTextAnnotation returns keys as symbols
     parameter = SimpleInlineTextAnnotation.parse(@text).deep_stringify_keys
 
     chunks = TokenChunk.new.from parameter, window_size: 30
@@ -26,7 +26,7 @@ class AiAnnotation < ApplicationRecord
       user_content = "#{simple_inline_text}\n\nPrompt:\n#{@prompt}"
       user_content += "\n\n(This is part #{index + 1}. Please annotate this part only.)" if chunks.take(2).size > 1
       adding_tokens_sum, adding_result = openai_annotator.call(user_content)
-      # SimpleInlineTextAnnotationはキーをシンボルで返します
+      # SimpleInlineTextAnnotation returns keys as symbols
       adding_result_as_json = SimpleInlineTextAnnotation.parse(adding_result).deep_stringify_keys
       [ tokens_sum + adding_tokens_sum, AnnotationMerger.new([result, adding_result_as_json].compact.reject(&:empty?)).merged ]
     end

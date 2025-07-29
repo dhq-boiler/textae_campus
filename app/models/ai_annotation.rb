@@ -28,7 +28,7 @@ class AiAnnotation < ApplicationRecord
       adding_tokens_sum, adding_result = openai_annotator.call(user_content)
       # SimpleInlineTextAnnotation returns keys as symbols
       adding_result_as_json = SimpleInlineTextAnnotation.parse(adding_result).deep_stringify_keys
-      [ tokens_sum + adding_tokens_sum, AnnotationMerger.new([result, adding_result_as_json].compact.reject(&:empty?)).merged ]
+      [ tokens_sum + adding_tokens_sum, AnnotationMerger.new([ result, adding_result_as_json ].compact.reject(&:empty?)).merged ]
     end
 
     self.token_used = total_tokens_used

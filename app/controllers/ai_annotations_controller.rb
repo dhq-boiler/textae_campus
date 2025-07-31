@@ -44,7 +44,7 @@ class AiAnnotationsController < ApplicationController
 
     @ai_annotation.prompt = ai_annotation_params[:prompt]
 
-    # 警告ダイアログでキャンセルボタンが押された時はフラッシュメッセージを出す
+    # Show a flash message when the cancel button is pressed in the warning dialog
     if params[:button] == "cancel"
       @ai_annotation.annotaiton = SimpleInlineTextAnnotation.parse(@ai_annotation.text).deep_stringify_keys.to_s.gsub(" =>", ":")
       @ai_annotation.save
@@ -67,7 +67,7 @@ class AiAnnotationsController < ApplicationController
       @ai_annotation.annotation = SimpleInlineTextAnnotation.generate(JSON.parse(ai_annotation_params[:content]))
       @content = JSON.parse(ai_annotation_params[:content], symbolize_names: true).deep_stringify_keys
       @prompt = ai_annotation_params[:prompt]
-      # annotate!がnilの場合（ダイアログ表示時）はedit画面を��表示
+      # annotate!がnilの場合（ダイアログ表示時）はedit画面を再表示
       render :edit, status: :unprocessable_entity
       return
     end

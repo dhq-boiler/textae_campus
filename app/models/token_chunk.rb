@@ -3,7 +3,7 @@ module TokenChunk
 
   # Generate token chunks from JSON data using the specified window size
   def self.from(annotations, window_size: 20, strict_mode: true)
-    # window_sizeが不正ならArgumentErrorを投げる
+    # Raise ArgumentError if window_size is invalid
     raise ArgumentError, "window_size must be greater than 0" if window_size <= 0
 
     # Analyze the text

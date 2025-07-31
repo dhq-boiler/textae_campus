@@ -14,5 +14,7 @@ Rails.application.routes.draw do
 
   get "/ai_annotations/new" => "ai_annotations#new"
   get "/ai_annotations/:uuid" => "ai_annotations#edit"
-  resources :ai_annotations, only: %i[create update]
+  put "/ai_annotations/:uuid" => "ai_annotations#update"
+  post "/ai_annotations/:uuid" => "ai_annotations#update"
+  resources :ai_annotations, param: :uuid, only: %i[new create edit update]
 end

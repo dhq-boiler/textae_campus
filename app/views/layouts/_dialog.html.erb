@@ -1,0 +1,65 @@
+<%
+  # Determine the open/closed state of the dialog
+  is_open = local_assigns[:dialog_opened] || false
+  # Get the dialog message
+  dialog_message = local_assigns[:message] || 'No message provided'
+  # Get the dialog buttons
+  dialog_buttons = local_assigns[:buttons] || [{label: 'OK', value: 'ok'}]
+  # Get content and prompt
+  content = local_assigns[:content] || ''
+  prompt = local_assigns[:prompt] || ''
+%>
+
+<dialog id="dialog" <%= "open" if is_open %>>
+  <div class="dialog-content">
+    <p><%= dialog_message %></p>
+
+    <%= form_with url: ai_annotation_path(local_assigns[:content]&.dig('uuid') || params[:uuid]),
+                  model: @ai_annotation,
+                  id: "dialog-form",
+                  local: true do |f| %>
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      <%= f.hidden_field :content, value: raw(content) %>
+      <%= f.hidden_field :prompt, value: prompt %>
+      <input type="hidden" name="button" id="dialog-button-value" />
+
+      <div class="dialog-buttons">
+        <% dialog_buttons.each do |btn| %>
+          <button type="button"
+                  data-action="<%= btn[:value] %>"
+                  onclick="document.getElementById('dialog-button-value').value='<%= btn[:value] %>'; document.getElementById('dialog-form').submit();">
+            <%= btn[:label] %>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</dialog>
+
+<% if is_open %>
+  <script>
+      // Add class to body when dialog is open
+      document.body.classList.add('dialog-overlay-active');
+
+      // Close dialog with ESC key
+      document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+              const dialog = document.getElementById('dialog');
+              if (dialog && dialog.open) {
+                  // Perform the same action as clicking the cancel button
+                  document.getElementById('dialog-button-value').value = 'cancel';
+                  document.getElementById('dialog-form').submit();
+              }
+          }
+      });
+
+      // Close dialog by clicking on the backdrop
+      document.getElementById('dialog').addEventListener('click', function(event) {
+          if (event.target === this) {
+              // Perform the same action as clicking the cancel button
+              document.getElementById('dialog-button-value').value = 'cancel';
+              document.getElementById('dialog-form').submit();
+          }
+      });
+  </script>
+<% end %>

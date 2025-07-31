@@ -1,11 +1,19 @@
+<%= render partial: 'layouts/dialog', locals: {
+  dialog_opened: @dialog_opened,
+  message: @dialog_message,
+  buttons: @dialog_buttons,
+  content: @content,
+  prompt: @prompt
+} %>
+
 <div class="textae-container">
-  <div id="ai-textae-editor" mode="view" inspect="current-annotation">
+  <div id="ai-textae-editor" mode="relation-edit" inspect="current-annotation">
     <%= @ai_annotation.content %>
   </div>
   <div id="current-annotation"></div>
 </div>
 
-<%= form_with model: @ai_annotation, url: ai_annotation_path(@ai_annotation.uuid), class: "ai-annotation-form" do |f| %>
+<%= form_with model: @ai_annotation, url: ai_annotation_path(@ai_annotation.uuid), class: "ai-annotation-form", local: true do |f| %>
   <div class="prompt-field">
     <%= f.textarea :prompt, required: true, rows: 3, placeholder: "Order how to annotate the text" %>
   </div>

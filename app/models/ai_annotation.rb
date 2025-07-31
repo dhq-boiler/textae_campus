@@ -13,7 +13,7 @@ class AiAnnotation < ApplicationRecord
     instance
   end
 
-  def annotate!
+  def annotate!(force: false)
     if @annotation.dig("selectedText", "status") == "selected"
       # Get selected range from the annotation
       begin_offset = @annotation.dig("selectedText", "begin").to_i
@@ -26,7 +26,11 @@ class AiAnnotation < ApplicationRecord
     self.token_used = tokens_used
     result = JSON.generate(result)
 
-    AiAnnotation.create!(prompt: prompt, content: result)
+    ai_annotation = AiAnnotation.create!(prompt: prompt, content: result)
+    # Return nil to show the warning dialog
+    return nil if result.nil? || tokens_used.nil?
+
+    ai_annotation
   end
 
   def text=(annotation)
@@ -41,6 +45,7 @@ class AiAnnotation < ApplicationRecord
     AiAnnotation.old.destroy_all
   end
 
+  private
   # Set a new UUID
   def set_uuid
     self.uuid = SecureRandom.uuid
@@ -66,8 +71,20 @@ class AiAnnotation < ApplicationRecord
     [ merged_result, tokens_used ]
   end
 
-  def sliding_window(annotation_json)
-    chunks = TokenChunk.from annotation_json, window_size: 50
+  def sliding_window(annotation_json, force: false)
+    begin
+      chunks = TokenChunk.from annotation_json, window_size: 20, strict_mode: !force
+    rescue Exceptions::RelationOutOfRangeError => e
+      if force
+        # If force mode, re-split with strict_mode: false
+        chunks = TokenChunk.from annotation_json, window_size: 20, strict_mode: false
+      else
+        # The selected choice (button value) should be obtained in the controller via params[:button]
+        # Cannot be obtained here, so interrupt processing
+        return
+      end
+    end
+
     result = chunks.each_with_object({ token_used: 0, chunk_results: [] })
                    .with_index do |(chunk, results), index|
       annotation_text = SimpleInlineTextAnnotation.generate(chunk)
@@ -94,5 +111,15 @@ class AiAnnotation < ApplicationRecord
       AnnotationMerger.new(result[:chunk_results]).merged,
       result[:token_used]
     ]
+  end
+
+  # Delete old annotations
+  def clean_old_annotations
+    AiAnnotation.old.destroy_all
+  end
+
+  # Set a new UUID
+  def set_uuid
+    self.uuid = SecureRandom.uuid
   end
 end

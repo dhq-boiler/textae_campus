@@ -1,8 +1,19 @@
 class AiAnnotationsController < ApplicationController
   include TokenLimitable
+  before_action :authenticate_user!
+
+  def index
+    @ai_annotations = current_user ? AiAnnotation.where(user: current_user) : []
+  end
+
+  def show
+    @ai_annotation = AiAnnotation.find_by(uuid: params[:uuid])
+    redirect_to root_path unless @ai_annotation
+  end
 
   def new
     @new_ai_annotation = AiAnnotation.new
+    @jwt_token = current_user&.jwt_token
     @history = AiAnnotation.order(created_at: :desc).limit(10)
   end
 
@@ -10,6 +21,7 @@ class AiAnnotationsController < ApplicationController
     text = ai_annotation_params[:text]
     prompt = ai_annotation_params[:prompt]
     @new_ai_annotation = AiAnnotation.prepare_with(text, prompt)
+    @new_ai_annotation.user = current_user if current_user
 
     ai_annotation = @new_ai_annotation.annotate!
     increment_token_usage(@new_ai_annotation.token_used)
@@ -22,12 +34,14 @@ class AiAnnotationsController < ApplicationController
   end
 
   def edit
-    @ai_annotation = AiAnnotation.find_by!(uuid: params[:uuid])
+    @ai_annotation = AiAnnotation.find_by(uuid: params[:uuid])
+    @jwt_token = current_user&.jwt_token
     @history = AiAnnotation.order(created_at: :desc).limit(10)
+    redirect_to root_path unless @ai_annotation
   end
 
   def update
-    @ai_annotation = AiAnnotation.find_by(uuid: params[:id])
+    @ai_annotation = AiAnnotation.find_by(uuid: params[:uuid])
     @history = AiAnnotation.order(created_at: :desc).limit(10)
     @ai_annotation.annotation = JSON.parse(ai_annotation_params[:content])
     @ai_annotation.prompt = ai_annotation_params[:prompt]
@@ -50,6 +64,6 @@ class AiAnnotationsController < ApplicationController
   private
 
   def ai_annotation_params
-    params.expect(ai_annotation: [ :text, :prompt, :content ])
+    params.require(:ai_annotation).permit(:text, :prompt, :content)
   end
 end

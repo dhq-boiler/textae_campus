@@ -258,3 +258,91 @@ header {
 .signin-button i {
   margin-right: 8px;
 }
+
+.submit-row {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  margin-top: 16px;
+}
+
+.api-key-field,
+.model-field {
+  flex: 1;
+}
+
+.submit-field {
+  flex-shrink: 0;
+  flex-basis: auto;
+  width: auto;
+}
+
+.api-key-field label,
+.model-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: rgb(56, 56, 56);
+}
+
+.api-key-field select,
+.model-field select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.api-key-field select:disabled,
+.model-field select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.ai-annotation-form .text-field,
+.ai-annotation-form .prompt-field {
+  margin-bottom: 16px;
+}
+
+.ai-annotation-form label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: rgb(56, 56, 56);
+}
+
+.ai-annotation-form textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.ai-annotation-form .button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.ai-annotation-form .button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.ai-annotation-form .button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+

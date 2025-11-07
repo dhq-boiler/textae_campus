@@ -5,14 +5,31 @@
   <div id="current-annotation"></div>
 </div>
 
-<%= form_with model: @ai_annotation, url: ai_annotation_path(@ai_annotation.uuid), class: "ai-annotation-form", data: { controller: "ai-annotation-form", action: "input->ai-annotation-form#updateSubmitButton" } do |f| %>
+<%= form_with model: @ai_annotation, url: ai_annotation_path(@ai_annotation.uuid), class: "ai-annotation-form", data: { controller: "ai-annotation-form llm-selector", action: "input->ai-annotation-form#updateSubmitButton", llm_selector_url_value: "http://localhost:3000/api/llm_api_keys/", llm_selector_jwt_token_value: @jwt_token } do |f| %>
   <div class="prompt-field">
+    <label>Prompt</label>
     <%= f.textarea :prompt, required: true, rows: 3, placeholder: "Order how to annotate the text", data: { ai_annotation_form_target: "prompt" } %>
   </div>
 
   <%= f.hidden_field :content, id: 'textae-annotation' %>
 
-  <div class="submit-field">
-    <%= f.submit "Annotate", disabled: true, class: "button", data: { ai_annotation_form_target: "submit" } %>
+  <div class="submit-row">
+    <div class="api-key-field">
+      <label>API Key</label>
+      <%= select_tag :api_key_uuid, options_for_select([]),
+          { required: true,
+            data: { llm_selector_target: "apiKeySelect", action: "change->llm-selector#apiKeyChanged change->ai-annotation-form#updateSubmitButton" } } %>
+    </div>
+
+    <div class="model-field">
+      <label>LLM model</label>
+      <%= select_tag :model, options_for_select([["APIキーを先に選択してください", ""]]),
+          { required: true, disabled: true,
+            data: { llm_selector_target: "modelSelect", action: "change->ai-annotation-form#updateSubmitButton" } } %>
+    </div>
+
+    <div class="submit-field">
+      <%= f.submit "Annotate", disabled: true, class: "button", data: { ai_annotation_form_target: "submit" } %>
+    </div>
   </div>
 <% end %>
